@@ -15,6 +15,15 @@ const playerHeight = 3.53;
 const playerRadius = 0.7;
 const cameraHeight = playerHeight - playerRadius;
 
+// Q3-style movement constants scaled by 0.038 (map scale); Q3 originals in comments.
+// Validation: Q3 gravity=800 * 0.038 = 30.4 ≈ GRAVITY=30 ✓
+const MOVE_SPEED = 12.2;    // max run speed        (Q3: 320 u/s  * 0.038)
+const GROUND_ACCEL = 10;    // ground acceleration  (Q3: 10  — dimensionless, no scaling)
+const AIR_ACCEL = 1;        // air acceleration     (Q3: 1   — dimensionless, enables strafe jumping)
+const FRICTION = 6;         // ground friction      (Q3: 6   — dimensionless, no scaling)
+const STOP_SPEED = 3.8;     // minimum control speed(Q3: 100  * 0.038)
+const JUMP_SPEED = 10.3;    // jump velocity        (Q3: 270 u/s  * 0.038)
+
 class Player {
     constructor(game) {
         this.playerCollider = new Capsule(new Vector3(0, playerRadius, 0), new Vector3(0, cameraHeight, 0), playerRadius);
@@ -66,30 +75,57 @@ class Player {
         }
     }
 
+    // Q3 PM_Friction: only applied on ground, horizontal only
+    _applyFriction(deltaTime) {
+        const vel = this.playerVelocity;
+        const speed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
+        if (speed < 0.001) {
+            vel.x = 0;
+            vel.z = 0;
+            return;
+        }
+        const control = speed < STOP_SPEED ? STOP_SPEED : speed;
+        let newspeed = speed - control * FRICTION * deltaTime;
+        if (newspeed < 0) newspeed = 0;
+        const scale = newspeed / speed;
+        vel.x *= scale;
+        vel.z *= scale;
+    }
+
+    // Q3 PM_Accelerate: adds velocity only up to wishspeed in the wish direction.
+    // The key insight: if wishdir is perpendicular to current velocity, currentspeed≈0,
+    // so you keep accelerating even above MOVE_SPEED — this is strafe jumping.
+    _accelerate(wishdir, wishspeed, accel, deltaTime) {
+        const vel = this.playerVelocity;
+        const currentspeed = vel.x * wishdir.x + vel.z * wishdir.z;
+        const addspeed = wishspeed - currentspeed;
+        if (addspeed <= 0) return;
+        let accelspeed = accel * deltaTime * wishspeed;
+        if (accelspeed > addspeed) accelspeed = addspeed;
+        vel.x += accelspeed * wishdir.x;
+        vel.z += accelspeed * wishdir.z;
+    }
+
     update(deltaTime) {
-        if (this.playerOnFloor && this.playerVelocity.y <= 0) {
-            if (this.wishdir.lengthSq() == 0) {
-                this.playerVelocity.addScaledVector(this.playerVelocity, -0.1);
-            } else {
-                this.wishdir.normalize();
-                this.wishdir.multiplyScalar(2 * 25 * deltaTime);
-                if (this.wishdir.dot(this.playerVelocity) < 0)
-                    this.wishdir.multiplyScalar(10);
-                this.playerVelocity.add(this.wishdir);
-                const damping = Math.exp(-3 * deltaTime) - 1;
-                this.playerVelocity.addScaledVector(this.playerVelocity, damping);
-            }
+        const onGround = this.playerOnFloor && this.playerVelocity.y <= 0;
+
+        const wishlen = this.wishdir.length();
+        const wishspeed = wishlen > 0 ? MOVE_SPEED : 0;
+        if (wishlen > 0) this.wishdir.normalize();
+
+        if (onGround) {
             if (this.wishJump) {
-                this.playerVelocity.y = 9;
+                this.playerVelocity.y = JUMP_SPEED;
                 this.wishJump = false;
                 audioHolder.play("jump");
             }
+            this._applyFriction(deltaTime);
+            this._accelerate(this.wishdir, wishspeed, GROUND_ACCEL, deltaTime);
         } else {
-            this.wishdir.normalize();
-            this.wishdir.multiplyScalar(10 * deltaTime);
-            this.playerVelocity.add(this.wishdir);
+            this._accelerate(this.wishdir, wishspeed, AIR_ACCEL, deltaTime);
             this.playerVelocity.y -= GRAVITY * deltaTime;
         }
+
         this.deltaPosition.copy(this.playerVelocity).multiplyScalar(deltaTime);
         this.playerCollider.translate(this.deltaPosition);
         this.playerCollisions();
@@ -97,7 +133,6 @@ class Player {
         if (!this.dead) {
             camera.position.copy(this.playerCollider.end);
         } else {
-            // slowly drop camera on death
             var t = Math.min(scene.elapsed - this.timeOfDeath, 1);
             camera.position.copy(this.playerCollider.end).lerp(this.playerCollider.start, t);
         }
