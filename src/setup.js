@@ -6,6 +6,7 @@ import { CustomOctree } from './lib/CustomOctree.js';
 import camera from './camera.js';
 import scene from './scene.js';
 import {initializeAudio} from './audio.js';
+import {initTriggers} from './trigger.js';
 
 function setupResizeListener(camera, renderer) {
     window.addEventListener('resize', () => {
@@ -46,7 +47,7 @@ class Game {
     loadMap(mapName, callback) {
         var loader = new GLTFLoader();
         document.getElementById("info").innerText = "Loading " + mapName + "...";
-        loader.load('maps/' + mapName + '.glb', (gltf) => {
+        loader.load('maps/' + mapName + '.glb', async (gltf) => {
             var oldLevel = scene.getObjectByName("level");
             if (oldLevel) scene.remove(oldLevel);
 
@@ -67,6 +68,7 @@ class Game {
             this.spawnPoint = center;
             this.player.respawn();
 
+            await initTriggers(mapName);
             document.getElementById("info").innerText = "";
             callback();
         }, undefined, (err) => {
