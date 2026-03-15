@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Instagib3</title>
+    <meta charset=utf-8 />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Monospace;
+            font-size: 13px;
+            line-height: 24px;
+            overscroll-behavior: none;
+        }
+        #menu {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            z-index: 10;
+        }
+        #menu h1 {
+            font-size: 48px;
+            font-family: Monospace;
+            color: #ff6600;
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+            width: 260px;
+        }
+        .field label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+        .field input, .field select {
+            background: #111;
+            color: #fff;
+            border: 2px solid #555;
+            padding: 8px 12px;
+            font-size: 16px;
+            font-family: Monospace;
+        }
+        .field input:focus, .field select:focus {
+            outline: none;
+            border-color: #ff6600;
+        }
+        input[type="color"] {
+            height: 40px;
+            padding: 2px 4px;
+            cursor: pointer;
+        }
+        #playBtn {
+            margin-top: 14px;
+            background: #ff6600;
+            color: #000;
+            border: none;
+            padding: 14px 40px;
+            font-size: 20px;
+            font-family: Monospace;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            width: 260px;
+        }
+        #playBtn:hover { background: #ff8833; }
+        .hint {
+            margin-top: 24px;
+            color: #555;
+            font-size: 11px;
+            text-align: center;
+            line-height: 20px;
+        }
+        #gun {
+            position: absolute;
+            bottom: 0px;
+            right: 15%;
+            padding: 10px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        #crosshair {
+            position: absolute;
+            height: 32px;
+            width: 32px;
+            left: 50%;
+            top: 50%;
+            margin-left: -16px;
+            margin-top: -16px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        #topfrags {
+            position: absolute;
+            border: 3px solid #FFF;
+            border-radius: 5px;
+            color: #FFF;
+            font-family: arial;
+            display: block;
+            top: 10px;
+            left: 10px;
+            background: #AA3333;
+            font-size: 20pt;
+            font-weight: bold;
+            padding: 5px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        #frags {
+            position: absolute;
+            border: 3px solid #FFF;
+            border-radius: 5px;
+            color: #FFF;
+            font-family: arial;
+            display: block;
+            bottom: 10px;
+            left: 10px;
+            background: #3333AA;
+            font-size: 20pt;
+            font-weight: bold;
+            padding: 5px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        #info {
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 1;
+        }
+        #container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <h1>INSTAGIB3</h1>
+
+        <div class="field">
+            <label for="nameInput">Name</label>
+            <input type="text" id="nameInput" maxlength="24" placeholder="Player" autofocus>
+        </div>
+
+        <div class="field">
+            <label for="colorInput">Color</label>
+            <input type="color" id="colorInput" value="#ffff00">
+        </div>
+
+        <div class="field">
+            <label for="mapSelect">Map</label>
+            <select id="mapSelect">
+                <option value="q3dm0">q3dm0</option>
+                <option value="q3dm1">q3dm1</option>
+                <option value="q3dm2">q3dm2</option>
+                <option value="q3dm3">q3dm3</option>
+                <option value="q3dm4">q3dm4</option>
+                <option value="q3dm5">q3dm5</option>
+                <option value="q3dm6">q3dm6</option>
+                <option value="q3dm7">q3dm7</option>
+                <option value="q3dm8">q3dm8</option>
+                <option value="q3dm9">q3dm9</option>
+                <option value="q3dm10">q3dm10</option>
+                <option value="q3dm11">q3dm11</option>
+                <option value="q3dm12">q3dm12</option>
+                <option value="q3dm13">q3dm13</option>
+                <option value="q3dm14">q3dm14</option>
+                <option value="q3dm15">q3dm15</option>
+                <option value="q3dm16">q3dm16</option>
+                <option value="q3dm17" selected>q3dm17 (The Longest Yard)</option>
+                <option value="q3dm18">q3dm18</option>
+                <option value="q3dm19">q3dm19</option>
+                <option value="q3tourney1">q3tourney1</option>
+                <option value="q3tourney2">q3tourney2</option>
+                <option value="q3tourney3">q3tourney3</option>
+                <option value="q3tourney4">q3tourney4</option>
+                <option value="q3tourney5">q3tourney5</option>
+                <option value="q3tourney6">q3tourney6</option>
+                <option value="q3tourney6_ctf">q3tourney6_ctf</option>
+                <option value="q3ctf1">q3ctf1</option>
+                <option value="q3ctf2">q3ctf2</option>
+                <option value="q3ctf3">q3ctf3</option>
+                <option value="q3ctf4">q3ctf4</option>
+                <option value="pro-q3dm6">pro-q3dm6</option>
+                <option value="pro-q3dm13">pro-q3dm13</option>
+                <option value="pro-q3tourney2">pro-q3tourney2</option>
+                <option value="pro-q3tourney4">pro-q3tourney4</option>
+            </select>
+        </div>
+
+        <button id="playBtn">PLAY</button>
+        <div class="hint">
+            WASD move &nbsp;|&nbsp; SPACE jump &nbsp;|&nbsp; LMB shoot &nbsp;|&nbsp; RMB zoom &nbsp;|&nbsp; K respawn<br>
+            Click to lock mouse &nbsp;|&nbsp; F11 fullscreen
+        </div>
+    </div>
+
+    <div id="container"></div>
+    <div id="info"></div>
+    <div id="topfrags" style="visibility:hidden">top score</div>
+    <div id="frags" style="visibility:hidden">0 frags</div>
+    <img src="images/gun.png" id="gun" style="visibility:hidden">
+    <img src="images/ch.png" id="crosshair" style="visibility:hidden">
+
+    <script type="module" src="./src/main.js"></script>
+    <script>
+        document.getElementById("playBtn").addEventListener("click", () => {
+            var name = document.getElementById("nameInput").value.trim() || "Player";
+            var color = document.getElementById("colorInput").value.replace("#", "");
+            var map = document.getElementById("mapSelect").value;
+
+            // Update URL so WebSocket gets the right query params
+            var params = new URLSearchParams({ name, room: map, color });
+            history.replaceState(null, '', '?' + params.toString());
+
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("frags").style.visibility = "visible";
+            document.getElementById("topfrags").style.visibility = "visible";
+            document.getElementById("gun").style.visibility = "visible";
+            document.getElementById("crosshair").style.visibility = "visible";
+
+            window.dispatchEvent(new CustomEvent("mapSelected", { detail: map }));
+        });
+
+        document.getElementById("nameInput").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") document.getElementById("playBtn").click();
+        });
+    </script>
+</body>
+</html>
