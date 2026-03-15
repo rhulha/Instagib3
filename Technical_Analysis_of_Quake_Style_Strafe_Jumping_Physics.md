@@ -53,12 +53,12 @@ As the player's speed $|\vec{v}|$ increases, $\cos(\theta_{opt})$ approaches 0, 
 ## 4. Engine Variations: Quake 1 vs. Quake 3
 
 ### Quake 1 & Source (Air Strafing)
-In *Quake 1* and the *Source Engine*, the air acceleration code (`SV_AirAccelerate`) typically uses a very low $v_{wish}$ (often 30 units/s). 
-* **The Result:** Because $v_{wish}$ is so small, the "Dead Zone" covers almost the entire forward hemisphere. To accelerate, the player **must** look almost 90° away from their movement direction. This allows for the extreme "curving" seen in *Counter-Strike* or *Team Fortress 2*.
+In *Quake 1* and the *Source Engine*, the air acceleration code (`SV_AirAccelerate`) **clamps $v_{wish}$ to a very low value** (typically 30 units/s), regardless of the player's actual movement speed.
+* **The Result:** Because the effective $v_{wish}$ is so small, `v_add` only becomes positive when the projection of the current velocity onto the wish direction is below 30. At any meaningful speed this requires looking almost 90° away from the direction of travel. This allows for the extreme continuous "curving" seen in *Counter-Strike* or *Team Fortress 2*.
 
 ### Quake 3 Arena (Strafe Jumping)
-In *Quake 3*, the $v_{wish}$ is not clamped to 30 in the same way, but the acceleration constant $A$ is much smaller.
-* **The Result:** The optimal angle is much narrower (often around 40-45° initially). This leads to "strafe jumping," where players alternate flicking their mouse left and right while holding the corresponding strafe keys.
+In *Quake 3*, `v_wish` is **not** clamped to a small value in air — it remains the full player speed (320 units/s). Instead, the air acceleration constant is very low (`pm_airaccelerate = 1.0`), limiting how much speed can be added per frame.
+* **The Result:** At speeds near 320 u/s the optimal angle (from Section 3) is around 0°, but as speed grows it approaches 90°. Players exploit this by alternating mouse flicks left and right while holding the matching strafe key, gaining a small speed increment each jump. The per-frame gain is small but compounds over successive jumps.
 
 ---
 
