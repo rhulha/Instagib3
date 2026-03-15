@@ -2,6 +2,8 @@ import { MathUtils } from './three/build/three.module.js';
 import camera from './camera.js';
 import {audioHolder} from './audio.js';
 
+var gameActive = false;
+
 var keyStates = {};
 keyStates['KeyW'] = keyStates['KeyA'] = keyStates['KeyS'] = keyStates['KeyD'] = false;
 
@@ -37,7 +39,10 @@ document.body.addEventListener( 'mousemove', ( event ) => {
     }
 }, false );
 
+window.addEventListener("mapSelected", () => { gameActive = true; });
+
 document.addEventListener( 'mousedown', (e) => {
+    if (!gameActive) return;
     if ( document.pointerLockElement !== document.body ) {
         document.body.requestPointerLock();
         return;
