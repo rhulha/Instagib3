@@ -1,8 +1,8 @@
 import {enemies} from './networking.js';
 
-const playerHeight = 3.53;
-const playerRadius = 0.7;
-const cameraHeight = playerHeight - playerRadius;
+const playerHeight = 2.13;
+const playerRadius = 0.55;
+const cameraHeight = 1.85;
 
 function checkPlayerPlayerCollisions(player) {
     for (var enemy_id in enemies) {

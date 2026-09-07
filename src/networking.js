@@ -70,7 +70,7 @@ webSocket.packet = function(msg) {
                     scene.add(e.obj3d);
                 }
                 var e = enemies[player.id];
-                player.y -= 0.35;
+                player.y -= 0.55;
                 e.actions[0].setEffectiveWeight(player.run ? 0 : 1);
                 e.actions[1].setEffectiveWeight(player.run ? 1 : 0);
                 e.p.copy(player);
