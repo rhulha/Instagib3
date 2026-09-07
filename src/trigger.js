@@ -1,5 +1,6 @@
 import { Vector3, Triangle } from './three/build/three.module.js';
 import { CustomOctree } from './lib/CustomOctree.js';
+import { audioHolder } from './audio.js';
 
 const SCALE = 0.038;
 const GRAVITY = 30;
@@ -48,9 +49,16 @@ async function initTriggers(mapName) {
 
     // targets lookup: targetname → Vector3 in Three.js space
     targets = {};
-    for (const tp of (entities.target_position || [])) {
-        const [qx, qy, qz] = tp.origin.split(' ').map(Number);
-        targets[tp.targetname] = new Vector3(qx * SCALE, qz * SCALE, -qy * SCALE);
+    for (const classname in entities) {
+        const list = entities[classname];
+        if (Array.isArray(list)) {
+            for (const ent of list) {
+                if (ent.targetname && ent.origin) {
+                    const [qx, qy, qz] = ent.origin.split(' ').map(Number);
+                    targets[ent.targetname] = new Vector3(qx * SCALE, qz * SCALE, -qy * SCALE);
+                }
+            }
+        }
     }
 
     triggerOctree = new CustomOctree();
@@ -73,8 +81,10 @@ async function initTriggers(mapName) {
 }
 
 function propel(origin, target) {
-    const height = target.y - origin.y;
+    let height = target.y - origin.y;
+    if (height <= 0) height = 0.5;
     const time = Math.sqrt(height / (0.5 * GRAVITY));
+    if (time <= 0) return new Vector3(0, 0, 0);
     const vel = target.clone().sub(origin);
     vel.y = 0;
     const dist = vel.length();
@@ -90,8 +100,11 @@ function checkTriggers(player) {
     if (result.userData.classname === 'trigger_push') {
         const target = targets[result.userData.target];
         if (!target) return;
-        player.playerVelocity.copy(propel(player.playerCollider.end, target));
+        player.playerVelocity.copy(propel(player.playerCollider.start, target));
         player.playerOnFloor = false;
+        if (audioHolder && audioHolder.jumppad && audioHolder.jumppad.paused) {
+            audioHolder.play("jumppad");
+        }
     }
 }
 
