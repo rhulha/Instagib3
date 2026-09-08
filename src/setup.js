@@ -7,6 +7,7 @@ import camera from './camera.js';
 import scene from './scene.js';
 import {initializeAudio} from './audio.js';
 import {initTriggers} from './trigger.js';
+import {initItems} from './items.js';
 
 function setupResizeListener(camera, renderer) {
     window.addEventListener('resize', () => {
@@ -69,6 +70,7 @@ class Game {
             this.player.respawn();
 
             await initTriggers(mapName);
+            await initItems(mapName);
             document.getElementById("info").innerText = "";
             callback();
         }, undefined, (err) => {

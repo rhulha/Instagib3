@@ -1,6 +1,7 @@
 import { Vector3, Triangle } from './three/build/three.module.js';
 import { CustomOctree } from './lib/CustomOctree.js';
 import { audioHolder } from './audio.js';
+import { loadEntities } from './entities.js';
 
 const SCALE = 0.038;
 const GRAVITY = 30;
@@ -33,13 +34,10 @@ function addBoxToOctree(octree, minX, minY, minZ, maxX, maxY, maxZ, userData) {
 }
 
 async function initTriggers(mapName) {
-    const [entitiesResp, modelsResp] = await Promise.all([
-        fetch('maps/' + mapName + '/entities.json'),
-        fetch('maps/' + mapName + '/models.csv')
+    const [entities, modelsText] = await Promise.all([
+        loadEntities(mapName),
+        fetch('maps/' + mapName + '/models.csv').then(r => r.text())
     ]);
-
-    const entities = await entitiesResp.json();
-    const modelsText = await modelsResp.text();
 
     // parse models.csv: min_x,min_y,min_z,max_x,max_y,max_z,... (Quake BSP space, z=up)
     const modelRows = modelsText.trim().split('\n').slice(1).map(line => {
