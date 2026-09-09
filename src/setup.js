@@ -7,6 +7,7 @@ import camera from './camera.js';
 import scene from './scene.js';
 import {initializeAudio} from './audio.js';
 import {initTriggers} from './trigger.js';
+import {initDoors} from './doors.js';
 import {initItems} from './items.js';
 
 function setupResizeListener(camera, renderer) {
@@ -60,6 +61,9 @@ class Game {
             scene.add(levelGroup);
             scene.updateMatrixWorld();
 
+            // Must run first: it flags the door meshes so they stay out of the
+            // static octree.
+            await initDoors(mapName, levelGroup);
             this.worldOctree.fromGraphNode(levelGroup, true);
 
             var bbox = new Box3().setFromObject(levelGroup);

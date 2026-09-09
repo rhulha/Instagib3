@@ -223,6 +223,7 @@ var CustomOctree = ( function () {
 		fromGraphNode: function ( group, doTransform ) {
 			group.traverse( ( obj ) => {
 				if ( obj.type === 'Mesh' ) {
+					if ( obj.userData.nonsolid ) return;
 					obj.updateMatrix();
 					obj.updateWorldMatrix();
 					var geometry, isTemp = false;

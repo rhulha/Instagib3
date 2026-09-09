@@ -8,6 +8,8 @@ import {keyStates, mouseStates, touchStates} from './input.js';
 import {audioHolder} from './audio.js';
 import {checkWorld, checkPlayerPlayerCollisions} from './collisions.js';
 import {checkTriggers} from './trigger.js';
+import {checkDoors} from './doors.js';
+import {checkItems} from './items.js';
 import * as hud from './hud.js';
 
 const GRAVITY = 30;
@@ -56,8 +58,10 @@ class Player {
 
     playerCollisions() {
         checkWorld(this);
+        checkDoors(this);
         if (!this.dead) checkPlayerPlayerCollisions(this);
         if (!this.dead) checkTriggers(this);
+        if (!this.dead) checkItems(this);
         if (this.playerCollider.end.y < -100) {
             this.frags--;
             hud.updateFragsCounter(this.frags);
